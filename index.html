@@ -481,7 +481,27 @@
       }, []);
 
       const toggle = (value) => {
-        setSelected(selected.includes(value) ? selected.filter(v => v !== value) : [...selected, value]);
+        const isOn = selected.includes(value);
+        // If this is a parent with children, toggle all children too
+        if (indentSet && !indentSet.has(value)) {
+          const children = [];
+          let found = false;
+          for (const opt of options) {
+            if (opt === value) { found = true; continue; }
+            if (found && indentSet.has(opt)) children.push(opt);
+            else if (found) break;
+          }
+          if (children.length > 0) {
+            if (isOn) {
+              setSelected(selected.filter(v => v !== value && !children.includes(v)));
+            } else {
+              const toAdd = [value, ...children].filter(v => !selected.includes(v));
+              setSelected([...selected, ...toAdd]);
+            }
+            return;
+          }
+        }
+        setSelected(isOn ? selected.filter(v => v !== value) : [...selected, value]);
       };
 
       const displayText = selected.length === 0 ? 'All' : selected.length === 1 ? selected[0] : `${selected.length} selected`;
