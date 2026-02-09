@@ -468,7 +468,7 @@
       { title: "Resource Adequacy (SPP)", region: "US", subregion: "SPP", owner: "Alex", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
     ];
 
-    const MultiSelectDropdown = ({ options, selected, setSelected }) => {
+    const MultiSelectDropdown = ({ options, selected, setSelected, indentSet }) => {
       const [open, setOpen] = useState(false);
       const ref = useRef(null);
 
@@ -546,19 +546,20 @@
                 </div>
                 {options.map(opt => {
                   const isSelected = selected.includes(opt);
+                  const isIndented = indentSet && indentSet.has(opt);
                   return (
                     <div
                       key={opt}
                       onClick={() => toggle(opt)}
                       style={{
-                        padding: '6px 12px',
-                        fontSize: '12px',
+                        padding: isIndented ? '5px 12px 5px 24px' : '6px 12px',
+                        fontSize: isIndented ? '11px' : '12px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        color: isSelected ? 'var(--purple-dark)' : 'var(--text-primary)',
-                        fontWeight: isSelected ? '600' : '400',
+                        color: isSelected ? 'var(--purple-dark)' : isIndented ? 'var(--text-secondary)' : 'var(--text-primary)',
+                        fontWeight: isSelected ? '600' : isIndented ? '400' : '500',
                         background: isSelected ? 'var(--purple-light)' : 'transparent',
                       }}
                       onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'var(--button-hover)'; }}
@@ -576,6 +577,7 @@
                           </svg>
                         )}
                       </div>
+                      {isIndented && <span style={{ color: 'var(--text-tertiary)', fontSize: '10px' }}>—</span>}
                       {opt}
                     </div>
                   );
@@ -912,10 +914,24 @@
         }));
       }, [filteredArticles]);
 
-      const regions = [...new Set([
-        ...articles.map(a => a.region),
-        ...articles.filter(a => a.subregion).map(a => a.subregion)
-      ])].sort();
+      const regions = useMemo(() => {
+        const subsByParent = {};
+        articles.forEach(a => {
+          if (a.subregion) {
+            if (!subsByParent[a.region]) subsByParent[a.region] = new Set();
+            subsByParent[a.region].add(a.subregion);
+          }
+        });
+        const result = [];
+        Object.keys(REGION_COLORS).forEach(region => {
+          result.push(region);
+          if (subsByParent[region]) {
+            [...subsByParent[region]].sort().forEach(sub => result.push(sub));
+          }
+        });
+        return result;
+      }, [articles]);
+      const subregionSet = useMemo(() => new Set(articles.filter(a => a.subregion).map(a => a.subregion)), [articles]);
       const cadences = ["Monthly", "Quarterly", "Bi-annual", "Annual", "2-year"];
       const owners = [...new Set(articles.map(a => a.owner))].sort();
 
@@ -1926,7 +1942,7 @@
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   <div>
                     <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Region</label>
-                    <MultiSelectDropdown options={regions} selected={filterRegions} setSelected={setFilterRegions} />
+                    <MultiSelectDropdown options={regions} selected={filterRegions} setSelected={setFilterRegions} indentSet={subregionSet} />
                   </div>
                   <div>
                     <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Cadence</label>
