@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Article Automation Dashboard 2026</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -413,6 +413,147 @@
       .action-buttons > label {
         font-size: 11px !important;
         padding: 6px 8px !important;
+      }
+    }
+
+    /* ================================================
+       Mobile App Layout: Bottom Nav + Tab Switching
+       ================================================ */
+
+    /* Bottom nav: hidden by default (desktop), shown on mobile */
+    .bottom-nav {
+      display: none;
+    }
+
+    /* Mobile overflow menu */
+    .mobile-overflow-menu {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      /* Show bottom nav */
+      .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #FFFFFF;
+        border-top: 1px solid var(--border-default);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+        z-index: 900;
+        padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        padding: 6px 12px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        position: relative;
+        -webkit-tap-highlight-color: transparent;
+        transition: color 0.15s ease;
+      }
+
+      .bottom-nav-item.active {
+        color: var(--purple);
+      }
+
+      .bottom-nav-item.add-btn {
+        color: var(--purple);
+      }
+
+      .filter-badge {
+        position: absolute;
+        top: 2px;
+        right: 4px;
+        background: var(--status-none);
+        color: #FFFFFF;
+        font-size: 8px;
+        font-weight: 700;
+        min-width: 14px;
+        height: 14px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 3px;
+      }
+
+      /* Hide guide on mobile */
+      .dashboard-guide {
+        display: none !important;
+      }
+
+      /* Hide desktop action buttons on mobile (replaced by bottom nav + overflow) */
+      .desktop-only {
+        display: none !important;
+      }
+
+      /* Show mobile-only elements */
+      .mobile-only {
+        display: flex !important;
+      }
+
+      .mobile-overflow-menu {
+        display: block;
+      }
+
+      /* Hide charts row on mobile (moved to Stats tab) */
+      .charts-row {
+        display: none !important;
+      }
+
+      /* Hide sidebar on mobile (replaced by Filters tab) */
+      .sidebar {
+        display: none !important;
+      }
+
+      /* Main content takes full width on mobile */
+      .sidebar-main-wrapper {
+        display: block !important;
+      }
+
+      /* Bottom nav clearance */
+      .dashboard-container {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      /* Mobile stats panel */
+      .mobile-stats-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      /* Mobile filters panel */
+      .mobile-filters-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .mobile-filters-panel .clear-all-btn {
+        padding: 10px;
+        background: var(--bg-surface-2);
+        color: var(--text-tertiary);
+        border: 1px solid var(--border-default);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        text-align: center;
       }
     }
   </style>
@@ -826,6 +967,16 @@
       const [editingArticle, setEditingArticle] = useState(null);
       const [groupBy, setGroupBy] = useState("Region");
       const [collapsedGroups, setCollapsedGroups] = useState({});
+
+      // Mobile app layout state
+      const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+      const [mobileTab, setMobileTab] = useState('articles');
+      useEffect(() => {
+        const handler = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handler);
+        return () => window.removeEventListener('resize', handler);
+      }, []);
+      const activeFilterCount = filterRegions.length + filterCadences.length + filterOwners.length;
 
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -1839,6 +1990,56 @@
         );
       };
 
+      // Mobile overflow menu for Export/Import
+      const MobileOverflowMenu = () => {
+        const [open, setOpen] = useState(false);
+        const menuRef = useRef(null);
+        useEffect(() => {
+          if (!open) return;
+          const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false); };
+          document.addEventListener('mousedown', handler);
+          return () => document.removeEventListener('mousedown', handler);
+        }, [open]);
+        return (
+          <div ref={menuRef} className="mobile-overflow-menu" style={{ position: 'relative' }}>
+            <button
+              onClick={() => setOpen(!open)}
+              style={{
+                padding: '7px 10px', background: 'var(--button-bg)', color: 'var(--text-secondary)',
+                border: '1px solid var(--button-border)', borderRadius: '4px', fontSize: '16px',
+                fontWeight: '700', cursor: 'pointer', lineHeight: 1, fontFamily: "'DM Sans', sans-serif"
+              }}
+            >&#x22EF;</button>
+            {open && (
+              <div style={{
+                position: 'absolute', top: '100%', right: 0, marginTop: '4px',
+                background: '#FFFFFF', border: '1px solid var(--border-default)',
+                borderRadius: '6px', boxShadow: 'var(--shadow-md)', zIndex: 200,
+                minWidth: '140px', overflow: 'hidden'
+              }}>
+                <button
+                  onClick={() => { exportData(); setOpen(false); }}
+                  style={{
+                    display: 'block', width: '100%', padding: '10px 14px', background: 'none',
+                    border: 'none', borderBottom: '1px solid var(--border-subtle)',
+                    fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)',
+                    cursor: 'pointer', textAlign: 'left', fontFamily: "'DM Sans', sans-serif"
+                  }}
+                >Export</button>
+                <label style={{
+                  display: 'block', width: '100%', padding: '10px 14px', fontSize: '13px',
+                  fontWeight: '500', color: 'var(--text-primary)', cursor: 'pointer',
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  Import
+                  <input type="file" accept=".json" onChange={(e) => { importData(e); setOpen(false); }} style={{ display: 'none' }} />
+                </label>
+              </div>
+            )}
+          </div>
+        );
+      };
+
       if (loading) {
         return (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '16px' }}>
@@ -1882,7 +2083,8 @@
                   )}
                 </p>
               </div>
-              <div className="action-buttons" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {/* Desktop action buttons */}
+              <div className="action-buttons desktop-only" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 <button
                   onClick={() => setShowAddModal(true)}
                   style={{
@@ -1961,6 +2163,25 @@
                   <input type="file" accept=".json" onChange={importData} style={{ display: 'none' }} />
                 </label>
               </div>
+
+              {/* Mobile action buttons: Edit + overflow menu */}
+              {isMobile && (
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <button
+                    onClick={() => setEditMode(!editMode)}
+                    style={{
+                      padding: '7px 14px',
+                      background: editMode ? 'var(--purple-light)' : 'var(--button-bg)',
+                      color: editMode ? 'var(--purple)' : 'var(--text-secondary)',
+                      border: `1px solid ${editMode ? 'var(--purple)' : 'var(--button-border)'}`,
+                      borderRadius: '6px', fontSize: '12px', fontWeight: '500', cursor: 'pointer'
+                    }}
+                  >
+                    {editMode ? 'Done' : 'Edit'}
+                  </button>
+                  <MobileOverflowMenu />
+                </div>
+              )}
             </div>
 
             {/* Charts + Stats Row */}
@@ -2052,8 +2273,125 @@
             </div>
           </div>
 
+          {/* Mobile: Stats Tab */}
+          {isMobile && mobileTab === 'stats' && (
+            <div className="mobile-stats-panel">
+              {/* Automation Donut Chart */}
+              <div style={{ background: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', alignSelf: 'flex-start' }}>Automation Status</div>
+                <svg viewBox="0 0 120 120" style={{ width: '140px', height: '140px' }}>
+                  {(() => {
+                    const total = stats.totalArticles || 1;
+                    const r = 45;
+                    const circumference = 2 * Math.PI * r;
+                    const segments = [
+                      { count: stats.fullyAutomated, color: '#27AE60' },
+                      { count: stats.inProgress, color: '#F2994A' },
+                      { count: stats.notStarted, color: '#E84365' },
+                    ];
+                    let offset = 0;
+                    return segments.map((seg, i) => {
+                      const dash = (seg.count / total) * circumference;
+                      const el = (
+                        <circle key={i} cx="60" cy="60" r={r} fill="none" stroke={seg.color}
+                          strokeWidth="14" strokeDasharray={`${dash} ${circumference - dash}`}
+                          strokeDashoffset={-offset} strokeLinecap="butt" transform="rotate(-90 60 60)" />
+                      );
+                      offset += dash;
+                      return el;
+                    });
+                  })()}
+                  <text x="60" y="56" textAnchor="middle" style={{ fontSize: '18px', fontWeight: '700', fill: 'var(--text-primary)' }}>{stats.totalArticles}</text>
+                  <text x="60" y="70" textAnchor="middle" style={{ fontSize: '9px', fontWeight: '500', fill: 'var(--text-tertiary)' }}>articles</text>
+                </svg>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '14px', width: '100%' }}>
+                  {[
+                    { label: 'Automated', count: stats.fullyAutomated, color: '#27AE60' },
+                    { label: 'In Progress', count: stats.inProgress, color: '#F2994A' },
+                    { label: 'Not Started', count: stats.notStarted, color: '#E84365' },
+                  ].map(item => (
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                      <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color, flexShrink: 0 }}></div>
+                      <span style={{ color: 'var(--text-secondary)' }}>{item.label}</span>
+                      <span style={{ marginLeft: 'auto', fontWeight: '600', color: 'var(--text-primary)' }}>{item.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Articles by Region Bar Chart */}
+              <div style={{ background: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Articles by Region</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {regionCounts.map(({ region, count, color, pct }) => (
+                    <div key={region}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                        <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>{region}</span>
+                        <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{count}</span>
+                      </div>
+                      <div style={{ height: '10px', background: 'var(--bg-surface-2)', borderRadius: '5px', overflow: 'hidden', border: '1px solid var(--border-default)' }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '5px', transition: 'width 0.3s ease' }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Region Legend */}
+              <div style={{ background: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>Regions</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                  {Object.entries(REGION_COLORS).map(([region, colors]) => (
+                    <div key={region} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{ width: '10px', height: '10px', background: colors.border, borderRadius: '50%' }}></div>
+                      <span style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-secondary)' }}>{region}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile: Filters Tab */}
+          {isMobile && mobileTab === 'filters' && (
+            <div className="mobile-filters-panel" style={{ background: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Filters</div>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Region</label>
+                <MultiSelectDropdown options={regions} selected={filterRegions} setSelected={setFilterRegions} indentSet={subregionSet} />
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Cadence</label>
+                <MultiSelectDropdown options={cadences} selected={filterCadences} setSelected={setFilterCadences} />
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Author</label>
+                <MultiSelectDropdown options={owners} selected={filterOwners} setSelected={setFilterOwners} />
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Group by</label>
+                <select
+                  value={groupBy}
+                  onChange={(e) => setGroupBy(e.target.value)}
+                  style={{ padding: '8px 10px', borderRadius: '4px', border: '1px solid var(--border-default)', fontSize: '13px', background: 'var(--input-bg)', color: 'var(--text-primary)', width: '100%' }}
+                >
+                  <option value="Region">Region</option>
+                  <option value="Owner">Author</option>
+                </select>
+              </div>
+              {activeFilterCount > 0 && (
+                <button
+                  className="clear-all-btn"
+                  onClick={() => { setFilterRegions([]); setFilterCadences([]); setFilterOwners([]); }}
+                >
+                  Clear All Filters ({activeFilterCount})
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Sidebar + Main Content */}
-          <div className="sidebar-main-wrapper" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+          <div className="sidebar-main-wrapper" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', ...(isMobile && mobileTab !== 'articles' ? { display: 'none' } : {}) }}>
 
             {/* Left Sidebar - Filters */}
             <div className="sidebar" style={{ width: '240px', flexShrink: 0, position: 'sticky', top: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -2087,7 +2425,7 @@
               </div>
 
               {/* Dashboard Guide */}
-              <div style={{ background: '#FFFFFF', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
+              <div className="dashboard-guide" style={{ background: '#FFFFFF', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
                 <div style={{ fontWeight: '600', marginBottom: '8px', color: 'var(--text-tertiary)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Guide</div>
                 <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--text-tertiary)', fontSize: '10px', lineHeight: '1.8' }}>
                   <li><strong style={{ color: 'var(--text-secondary)' }}>Headers:</strong> Click to expand/collapse</li>
@@ -2229,6 +2567,58 @@
               onSave={handleEditArticle}
             />
           )}
+
+          {/* Mobile Bottom Navigation */}
+          <nav className="bottom-nav">
+            <button
+              className={`bottom-nav-item${mobileTab === 'articles' ? ' active' : ''}`}
+              onClick={() => setMobileTab('articles')}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+              <span>Articles</span>
+            </button>
+            <button
+              className={`bottom-nav-item${mobileTab === 'stats' ? ' active' : ''}`}
+              onClick={() => setMobileTab('stats')}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              <span>Stats</span>
+            </button>
+            <button
+              className="bottom-nav-item add-btn"
+              onClick={() => setShowAddModal(true)}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Add</span>
+            </button>
+            <button
+              className={`bottom-nav-item${mobileTab === 'filters' ? ' active' : ''}`}
+              onClick={() => setMobileTab('filters')}
+              style={{ position: 'relative' }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="filter-badge">{activeFilterCount}</span>
+              )}
+            </button>
+          </nav>
         </div>
       );
     };
