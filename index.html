@@ -832,7 +832,7 @@
 
       const filteredArticles = useMemo(() => {
         return articles.filter(a =>
-          (filterRegions.length === 0 || filterRegions.includes(a.region)) &&
+          (filterRegions.length === 0 || filterRegions.includes(a.subregion || a.region)) &&
           (filterCadences.length === 0 || filterCadences.includes(a.cadence)) &&
           (filterOwners.length === 0 || filterOwners.includes(a.owner))
         );
@@ -912,7 +912,7 @@
         }));
       }, [filteredArticles]);
 
-      const regions = [...new Set(articles.map(a => a.region))].sort();
+      const regions = [...new Set(articles.map(a => a.subregion || a.region))].sort();
       const cadences = ["Monthly", "Quarterly", "Bi-annual", "Annual", "2-year"];
       const owners = [...new Set(articles.map(a => a.owner))].sort();
 
