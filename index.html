@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article Automation Dashboard 2026</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Modo Energy - Base Surfaces */
+      --bg-base: #F8F8FB;
+      --bg-surface-1: #FFFFFF;
+      --bg-surface-2: #F8F8FB;
+      --bg-surface-3: #EAEAF2;
+
+      /* Borders & Dividers */
+      --border-subtle: #EAEAF2;
+      --border-default: #EAEAF2;
+      --border-strong: #CDCDDE;
+
+      /* Text Hierarchy */
+      --text-primary: #1A1A1A;
+      --text-secondary: #4C4C71;
+      --text-tertiary: #8C8CAA;
+      --text-accent: #705FE6;
+
+      /* Status/Automation */
+      --status-complete: #27AE60;
+      --status-progress: #F2994A;
+      --status-none: #E84365;
+      --status-complete-bg: rgba(39, 174, 96, 0.08);
+      --status-progress-bg: rgba(242, 153, 74, 0.08);
+      --status-none-bg: rgba(232, 67, 101, 0.08);
+
+      /* Interactive Elements */
+      --button-bg: #FFFFFF;
+      --button-hover: #F8F8FB;
+      --button-border: #EAEAF2;
+      --input-bg: #FFFFFF;
+      --input-focus: rgba(112, 95, 230, 0.15);
+
+      /* Brand */
+      --purple: #705FE6;
+      --purple-dark: #4E42A1;
+      --purple-light: #ECEAFA;
+      --purple-glow: rgba(112, 95, 230, 0.15);
+      --purple-shadow: rgba(112, 95, 230, 0.25);
+
+      /* Shadows */
+      --shadow: 0 1px 3px rgba(18,18,43,0.12);
+      --shadow-md: 0 4px 14px rgba(18,18,43,0.14);
+      --shadow-lg: 0 8px 24px rgba(18,18,43,0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-base);
+      min-height: 100vh;
+      padding: 0;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      transition: all 150ms ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    button:hover {
+      opacity: 1;
+    }
+
+    button:active {
+      transform: translateY(0.5px);
+    }
+
+    input[type="text"], select, input[type="number"], input[type="date"] {
+      padding: 8px 12px;
+      border: 1px solid var(--border-default);
+      border-radius: 4px;
+      font-size: 14px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      transition: all 150ms ease;
+    }
+
+    input[type="text"]:focus, select:focus, input[type="number"]:focus, input[type="date"]:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px var(--input-focus);
+    }
+
+    select {
+      cursor: pointer;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238C8CAA' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 28px;
+    }
+
+    .date-input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .date-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-default);
+      border-radius: 4px;
+    }
+
+    .date-input-wrapper input[type="date"] {
+      flex: 1;
+      padding: 4px 6px;
+      font-size: 11px;
+      border: 1px solid var(--border-default);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      border-radius: 4px;
+    }
+
+    .date-input-wrapper button {
+      padding: 2px 6px;
+      background: var(--status-none-bg);
+      color: var(--status-none);
+      border: 1px solid rgba(232, 67, 101, 0.2);
+      border-radius: 4px;
+      font-size: 9px;
+      cursor: pointer;
+    }
+
+    .date-input-wrapper button:hover {
+      background: rgba(232, 67, 101, 0.15);
+      border-color: rgba(232, 67, 101, 0.4);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 15, 25, 0.50);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: #FFFFFF;
+      padding: 32px;
+      border-radius: 8px;
+      max-width: 580px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-default);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .collapsible-section {
+      background: #FFFFFF;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 150ms ease;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow);
+    }
+
+    .collapsible-section:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+    }
+
+    .collapsible-header {
+      padding: 14px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: background 150ms ease;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .collapsible-header:hover {
+      background: rgba(112, 95, 230, 0.03);
+    }
+
+    .collapsible-content {
+      padding: 0 20px 16px 20px;
+      display: none;
+    }
+
+    .collapsible-content.open {
+      display: block;
+    }
+
+    .region-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    .chevron {
+      transition: transform 0.3s ease;
+      font-size: 16px;
+      color: var(--text-tertiary);
+    }
+
+    .chevron.open {
+      transform: rotate(90deg);
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(140, 140, 170, 0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 140, 170, 0.35); }
+
+    /* Selection */
+    ::selection { background: var(--purple-light); color: var(--text-primary); }
+
+    /* Focus Visible */
+    :focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+
+    /* Custom checkbox styling */
+    input[type="checkbox"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      cursor: pointer;
+      position: relative;
+      transition: all 150ms ease;
+      flex-shrink: 0;
+    }
+
+    input[type="checkbox"]:checked {
+      background: var(--purple);
+      border-color: var(--purple);
+    }
+
+    input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 4.5px;
+      top: 1.5px;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    input[type="checkbox"]:hover {
+      border-color: var(--purple);
+    }
+
+    select option {
+      background: #FFFFFF;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+    // ================================================================
+    // CONFIGURATION — Update these values to enable shared team mode
+    // ================================================================
+    // 1. Create a free Supabase project at https://supabase.com
+    // 2. In the SQL Editor, run:
+    //      CREATE TABLE dashboard_data (
+    //        id text PRIMARY KEY,
+    //        data jsonb NOT NULL DEFAULT '[]'::jsonb,
+    //        updated_at timestamptz DEFAULT now()
+    //      );
+    //      ALTER TABLE dashboard_data ENABLE ROW LEVEL SECURITY;
+    //      CREATE POLICY "Allow all" ON dashboard_data
+    //        FOR ALL USING (true) WITH CHECK (true);
+    // 3. Go to Project Settings > API and copy URL + anon key
+    // 4. (Optional) Enable Realtime for the dashboard_data table
+    // ================================================================
+    const SUPABASE_URL = 'https://ejgjshtkozglwqxmuwla.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqZ2pzaHRrb3pnbHdxeG11d2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MzUzOTcsImV4cCI6MjA4NjIxMTM5N30.j6YZOMffKBoIROUZREDfoe47TmxCBWVBPARj91SUwNQ';
+    const DASHBOARD_PASSWORD = 'modo2026';
+    const USE_SUPABASE = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+    let supabaseClient = null;
+    if (USE_SUPABASE && window.supabase) {
+      try {
+        const sb = window.supabase;
+        const factory = sb.createClient || (sb.default && sb.default.createClient);
+        supabaseClient = factory(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch (e) {
+        console.error('Supabase init failed:', e);
+      }
+    }
+    const SUPABASE_READY = !!supabaseClient;
+
+    // Region color palette - Modo Energy light mode
+    const REGION_COLORS = {
+      'Global': { bg: 'rgba(140, 140, 170, 0.08)', border: '#8C8CAA', text: '#6B6B8A' },
+      'GB': { bg: 'rgba(47, 128, 237, 0.08)', border: '#2F80ED', text: '#2F80ED' },
+      'Europe': { bg: 'rgba(112, 95, 230, 0.08)', border: '#705FE6', text: '#705FE6' },
+      'Australia': { bg: 'rgba(242, 153, 74, 0.08)', border: '#F2994A', text: '#D4792A' },
+      'US': { bg: 'rgba(39, 174, 96, 0.08)', border: '#27AE60', text: '#1E8C4D' },
+    };
+
+    const STEP_LABELS = [
+      'Data (pulling + handling)',
+      'Data analysis',
+      'Chart creation',
+      'Article writing & editing',
+      'Final check (fully integrated)'
+    ];
+
+    const INITIAL_ARTICLES = [
+      // Global Region
+      { title: "CAPEX survey", region: "Global", owner: "Ed P", cadence: "2-year", automation: 0, dates: ["2026-12-15"] },
+      { title: "Non-lithium", region: "Global", owner: "Timoth\u00e9e", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "What do batteries do for power grids", region: "Global", owner: "Zach W", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+
+      // GB Region
+      { title: "Battery Revenue Performance", region: "GB", owner: "Zach J", cadence: "Monthly", automation: 5, dates: ["2026-01-15","2026-02-15","2026-03-15","2026-04-15","2026-05-15","2026-06-15","2026-07-15","2026-08-15","2026-09-15","2026-10-15","2026-11-15","2026-12-15"] },
+      { title: "Benefit to Consumer", region: "GB", owner: "Zach J", cadence: "Bi-annual", automation: 4, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Carbon Impact", region: "GB", owner: "Zach J", cadence: "Bi-annual", automation: 4, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Availability", region: "GB", owner: "Zach J", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Degradation", region: "GB", owner: "Zach J", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Cycle rates", region: "GB", owner: "Zach J", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Buildout", region: "GB", owner: "Zach J", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Triads", region: "GB", owner: "Zach J", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Capacity Market Qualification", region: "GB", owner: "Arthur", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Capacity Market Results", region: "GB", owner: "Arthur", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Investment Outlook", region: "GB", owner: "Arthur", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Forecast update", region: "GB", owner: "Arthur", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "BESS Suppliers to GB", region: "GB", owner: "Joe", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Livestream takeaways", region: "GB", owner: "Joe", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+
+      // Europe Region (includes Germany, France, Spain, Italy sub-regions)
+      // Europe-wide articles
+      { title: "Latest in TB spreads", region: "Europe", owner: "Zach J", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Solar capture rates across Europe", region: "Europe", owner: "Till", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Gas markets", region: "Europe", owner: "Till", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Deal Wrap up", region: "Europe", owner: "Cosima", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      // Germany sub-region
+      { title: "Investment Outlook (Germany)", region: "Europe", subregion: "Germany", owner: "Cosima", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Forecast Update (Germany)", region: "Europe", subregion: "Germany", owner: "Cosima", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Battery buildout (Germany)", region: "Europe", subregion: "Germany", owner: "Till", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Livestream takeaways (Germany)", region: "Europe", subregion: "Germany", owner: "Cosima", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      // France sub-region
+      { title: "Nuclear Performance and availability", region: "Europe", subregion: "France", owner: "Timoth\u00e9e", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Battery Buildout (France)", region: "Europe", subregion: "France", owner: "Timoth\u00e9e", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Solar auctions (AO PPE2 Neutre)", region: "Europe", subregion: "France", owner: "Timoth\u00e9e", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Livestream takeaways (France)", region: "Europe", subregion: "France", owner: "Timoth\u00e9e", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      // Spain sub-region
+      { title: "Investor Outlook (Spain)", region: "Europe", subregion: "Spain", owner: "Pablo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Forecast Update (Spain)", region: "Europe", subregion: "Spain", owner: "Pablo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Battery Buildout (Spain)", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Gas run profiles", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Country specific capture rates", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Hydro run profiles", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Livestream takeaways (Spain)", region: "Europe", subregion: "Spain", owner: "Pablo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      // Italy sub-region
+      { title: "FER-X", region: "Europe", subregion: "Italy", owner: "Timoth\u00e9e", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Battery Buildout (Italy)", region: "Europe", subregion: "Italy", owner: "Timoth\u00e9e", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Capacity Market (Italy)", region: "Europe", subregion: "Italy", owner: "Timoth\u00e9e", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Livestream takeaways (Italy)", region: "Europe", subregion: "Italy", owner: "Timoth\u00e9e", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+
+      // Australia Region (NEM sub-region)
+      { title: "BESS Revenues", region: "Australia", subregion: "NEM", owner: "Marcus", cadence: "Monthly", automation: 5, dates: ["2026-01-15","2026-02-15","2026-03-15","2026-04-15","2026-05-15","2026-06-15","2026-07-15","2026-08-15","2026-09-15","2026-10-15","2026-11-15","2026-12-15"] },
+      { title: "Battery Capture Rates", region: "Australia", subregion: "NEM", owner: "Marcus", cadence: "Quarterly", automation: 5, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Investment Outlook", region: "Australia", subregion: "NEM", owner: "Marcus", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Livestream wrap up", region: "Australia", subregion: "NEM", owner: "Marcus", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Battery Buildout", region: "Australia", subregion: "NEM", owner: "Frances", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Deal wrap up", region: "Australia", subregion: "NEM", owner: "Frances", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Solar Capture Rates", region: "Australia", subregion: "NEM", owner: "Frances", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+
+      // US Region (includes ERCOT, CAISO, PJM, NYISO, MISO, SPP sub-regions)
+      { title: "Monthly Revenues", region: "US", owner: "Ovais", cadence: "Monthly", automation: 0, dates: ["2026-01-15","2026-02-15","2026-03-15","2026-04-15","2026-05-15","2026-06-15","2026-07-15","2026-08-15","2026-09-15","2026-10-15","2026-11-15","2026-12-15"] },
+      { title: "Battery Buildout", region: "US", owner: "Ovais", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Demand growth", region: "US", owner: "Ovais", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Battery Degradation", region: "US", owner: "Ovais", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Congestion report", region: "US", owner: "Ovais", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "How did power prices evolve", region: "US", owner: "Ovais", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Asset availability", region: "US", owner: "Ovais", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Optimiser Capture Rates", region: "US", owner: "Logan", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Month Performance", region: "US", owner: "Logan", cadence: "Monthly", automation: 0, dates: ["2026-01-15","2026-02-15","2026-03-15","2026-04-15","2026-05-15","2026-06-15","2026-07-15","2026-08-15","2026-09-15","2026-10-15","2026-11-15","2026-12-15"] },
+      { title: "Investor Outlook", region: "US", owner: "Logan", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Resource Adequacy", region: "US", owner: "Logan", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Battery Buildout", region: "US", owner: "Logan", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Power prices and spreads by zone", region: "US", owner: "Logan", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Forecast Update", region: "US", owner: "Logan", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Investment Outlook", region: "US", owner: "Alex D", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Forecast Update", region: "US", owner: "Alex D", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Battery Benchmark", region: "US", owner: "Deeksha", cadence: "Monthly", automation: 0, dates: ["2026-01-15","2026-02-15","2026-03-15","2026-04-15","2026-05-15","2026-06-15","2026-07-15","2026-08-15","2026-09-15","2026-10-15","2026-11-15","2026-12-15"] },
+      { title: "Capacity Market", region: "US", owner: "Deeksha", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Livestream Takeaways", region: "US", owner: "Deeksha", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Demand Growth", region: "US", owner: "Deeksha", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      // NYISO sub-region
+      { title: "Index Storage Credit", region: "US", subregion: "NYISO", owner: "Aaron", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Battery Benchmark (NYISO)", region: "US", subregion: "NYISO", owner: "Aaron", cadence: "Monthly", automation: 0, dates: ["2026-01-15","2026-02-15","2026-03-15","2026-04-15","2026-05-15","2026-06-15","2026-07-15","2026-08-15","2026-09-15","2026-10-15","2026-11-15","2026-12-15"] },
+      { title: "Buildout/ Queue Update (NYISO)", region: "US", subregion: "NYISO", owner: "Will", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Capacity Market (NYISO)", region: "US", subregion: "NYISO", owner: "Will", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      // MISO sub-region
+      { title: "Buildout/ Queue Update (MISO)", region: "US", subregion: "MISO", owner: "Will", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Capacity Markets (MISO)", region: "US", subregion: "MISO", owner: "Will", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
+      { title: "Battery Benchmark (MISO)", region: "US", subregion: "MISO", owner: "Will", cadence: "Monthly", automation: 0, dates: ["2026-01-15","2026-02-15","2026-03-15","2026-04-15","2026-05-15","2026-06-15","2026-07-15","2026-08-15","2026-09-15","2026-10-15","2026-11-15","2026-12-15"] },
+      // SPP sub-region
+      { title: "Buildout/ Queue Update (SPP)", region: "US", subregion: "SPP", owner: "Alex", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Resource Adequacy (SPP)", region: "US", subregion: "SPP", owner: "Alex", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+    ];
+
+    const MultiSelectDropdown = ({ options, selected, setSelected }) => {
+      const [open, setOpen] = useState(false);
+      const ref = useRef(null);
+
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, []);
+
+      const toggle = (value) => {
+        setSelected(selected.includes(value) ? selected.filter(v => v !== value) : [...selected, value]);
+      };
+
+      const displayText = selected.length === 0 ? 'All' : selected.length === 1 ? selected[0] : `${selected.length} selected`;
+
+      return (
+        <div ref={ref} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setOpen(!open)}
+            style={{
+              padding: '4px 28px 4px 10px',
+              fontSize: '12px',
+              fontWeight: selected.length > 0 ? '600' : '400',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              transition: 'all 150ms ease',
+              border: selected.length > 0 ? '1px solid var(--purple)' : '1px solid var(--border-default)',
+              background: selected.length > 0 ? 'var(--purple-light)' : 'var(--input-bg)',
+              color: selected.length > 0 ? 'var(--purple-dark)' : 'var(--text-primary)',
+              fontFamily: "'DM Sans', sans-serif",
+              textAlign: 'left',
+              width: '100%',
+              minWidth: '110px',
+              backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238C8CAA' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")",
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 8px center',
+            }}
+          >
+            {displayText}
+          </button>
+          {open && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              marginTop: '4px',
+              background: '#FFFFFF',
+              border: '1px solid var(--border-default)',
+              borderRadius: '4px',
+              boxShadow: 'var(--shadow-md)',
+              zIndex: 100,
+              minWidth: '160px',
+              maxHeight: '280px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+              <div style={{ overflowY: 'auto', padding: '4px 0', flex: 1 }}>
+                <div
+                  onClick={() => { if (selected.length > 0) setSelected([]); }}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    cursor: selected.length > 0 ? 'pointer' : 'default',
+                    color: selected.length > 0 ? 'var(--text-tertiary)' : 'var(--border-strong)',
+                    fontStyle: 'italic',
+                    borderBottom: '1px solid var(--border-subtle)',
+                    marginBottom: '2px',
+                  }}
+                  onMouseEnter={(e) => { if (selected.length > 0) e.currentTarget.style.background = 'var(--button-hover)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                >
+                  Clear all
+                </div>
+                {options.map(opt => {
+                  const isSelected = selected.includes(opt);
+                  return (
+                    <div
+                      key={opt}
+                      onClick={() => toggle(opt)}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: isSelected ? 'var(--purple-dark)' : 'var(--text-primary)',
+                        fontWeight: isSelected ? '600' : '400',
+                        background: isSelected ? 'var(--purple-light)' : 'transparent',
+                      }}
+                      onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'var(--button-hover)'; }}
+                      onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      <div style={{
+                        width: '14px', height: '14px', borderRadius: '3px', flexShrink: 0,
+                        border: isSelected ? '1px solid var(--purple)' : '1px solid var(--border-strong)',
+                        background: isSelected ? 'var(--purple)' : '#FFFFFF',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {isSelected && (
+                          <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                            <path d="M2 5L4.5 7.5L8 2.5" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                      {opt}
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ borderTop: '1px solid var(--border-subtle)', padding: '6px 8px' }}>
+                <button
+                  onClick={() => setOpen(false)}
+                  style={{
+                    width: '100%',
+                    padding: '5px 12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    background: 'var(--purple)',
+                    color: '#FFFFFF',
+                    border: '1px solid var(--purple)',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const PasswordGate = ({ onSuccess }) => {
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState(false);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (password === DASHBOARD_PASSWORD) {
+          sessionStorage.setItem('dashboard_auth', 'true');
+          onSuccess();
+        } else {
+          setError(true);
+          setTimeout(() => setError(false), 1500);
+        }
+      };
+
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px' }}>
+          <div style={{
+            background: '#FFFFFF', padding: '40px', borderRadius: '8px',
+            border: '1px solid var(--border-default)', borderTop: '3px solid var(--purple)',
+            boxShadow: 'var(--shadow-lg)', width: '100%', maxWidth: '380px', textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '13px', fontWeight: '700', letterSpacing: '6px', color: 'var(--purple)', marginBottom: '8px' }}>MODO ENERGY</div>
+            <h1 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '6px' }}>Article Automation Dashboard</h1>
+            <p style={{ fontSize: '13px', color: 'var(--text-tertiary)', marginBottom: '24px' }}>Enter the team password to continue</p>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                autoFocus
+                style={{
+                  width: '100%', padding: '10px 14px', fontSize: '14px',
+                  border: `1px solid ${error ? 'var(--status-none)' : 'var(--border-default)'}`,
+                  borderRadius: '4px', marginBottom: '12px', outline: 'none',
+                  background: error ? 'var(--status-none-bg)' : 'var(--input-bg)',
+                  transition: 'all 150ms ease'
+                }}
+              />
+              <button type="submit" style={{
+                width: '100%', padding: '10px', background: 'var(--purple)', color: '#FFFFFF',
+                border: '1px solid var(--purple)', borderRadius: '4px', fontSize: '14px',
+                fontWeight: '600', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif"
+              }}>
+                Sign In
+              </button>
+              {error && <p style={{ color: 'var(--status-none)', fontSize: '12px', marginTop: '10px', fontWeight: '500' }}>Incorrect password</p>}
+            </form>
+          </div>
+        </div>
+      );
+    };
+
+    const AutomationDashboard = () => {
+      const normalizeArticle = (article) => {
+        const existingSteps = Array.isArray(article.automationSteps) ? article.automationSteps.slice(0, 5) : null;
+        if (existingSteps && existingSteps.length === 5) {
+          return { ...article, automationSteps: existingSteps };
+        }
+        const automationCount = Number.isInteger(article.automation)
+          ? Math.max(0, Math.min(5, article.automation))
+          : 0;
+        return {
+          ...article,
+          automationSteps: STEP_LABELS.map((_, idx) => idx < automationCount),
+          resources: Array.isArray(article.resources) ? article.resources : []
+        };
+      };
+
+      const normalizeArticles = (items) => items.map(normalizeArticle);
+
+      const [articles, setArticles] = useState(() => {
+        const saved = localStorage.getItem('automationArticles');
+        const baseArticles = saved ? JSON.parse(saved) : INITIAL_ARTICLES;
+        return normalizeArticles(baseArticles);
+      });
+      const [loading, setLoading] = useState(SUPABASE_READY);
+      const [syncStatus, setSyncStatus] = useState(SUPABASE_READY ? 'Connecting...' : '');
+      const saveTimeoutRef = useRef(null);
+      const isSavingRef = useRef(false);
+
+      const [filterRegions, setFilterRegions] = useState([]);
+      const [filterCadences, setFilterCadences] = useState([]);
+      const [filterOwners, setFilterOwners] = useState([]);
+      const [editMode, setEditMode] = useState(false);
+      const [showAddModal, setShowAddModal] = useState(false);
+      const [editingArticle, setEditingArticle] = useState(null);
+      const [groupBy, setGroupBy] = useState("Region");
+      const [collapsedGroups, setCollapsedGroups] = useState({});
+
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      // Load from Supabase on mount
+      useEffect(() => {
+        if (!SUPABASE_READY) return;
+        const load = async () => {
+          try {
+            const { data, error } = await supabaseClient
+              .from('dashboard_data').select('data').eq('id', 'articles').single();
+            if (data?.data) {
+              setArticles(normalizeArticles(data.data));
+              setSyncStatus('Synced');
+            } else if (error && error.code === 'PGRST116') {
+              // No row yet — seed with current data
+              const saved = localStorage.getItem('automationArticles');
+              const initial = saved ? JSON.parse(saved) : INITIAL_ARTICLES;
+              await supabaseClient.from('dashboard_data')
+                .insert({ id: 'articles', data: initial, updated_at: new Date().toISOString() });
+              setSyncStatus('Synced');
+            }
+          } catch (e) {
+            setSyncStatus('Offline');
+          }
+          setLoading(false);
+        };
+        load();
+      }, []);
+
+      // Real-time sync from other team members
+      useEffect(() => {
+        if (!SUPABASE_READY) return;
+        const channel = supabaseClient.channel('dashboard-sync')
+          .on('postgres_changes',
+            { event: '*', schema: 'public', table: 'dashboard_data', filter: 'id=eq.articles' },
+            (payload) => {
+              if (isSavingRef.current) return;
+              if (payload.new?.data) {
+                setArticles(normalizeArticles(payload.new.data));
+                setSyncStatus('Synced');
+              }
+            })
+          .subscribe();
+        return () => supabaseClient.removeChannel(channel);
+      }, []);
+
+      // Save to localStorage + Supabase (debounced)
+      useEffect(() => {
+        localStorage.setItem('automationArticles', JSON.stringify(articles));
+        if (SUPABASE_READY && !loading) {
+          clearTimeout(saveTimeoutRef.current);
+          setSyncStatus('Saving...');
+          saveTimeoutRef.current = setTimeout(async () => {
+            try {
+              isSavingRef.current = true;
+              await supabaseClient.from('dashboard_data')
+                .upsert({ id: 'articles', data: articles, updated_at: new Date().toISOString() });
+              setSyncStatus('Synced');
+              setTimeout(() => { isSavingRef.current = false; }, 2000);
+            } catch (e) {
+              setSyncStatus('Save failed');
+              isSavingRef.current = false;
+            }
+          }, 1000);
+        }
+      }, [articles, loading]);
+
+      const getRegionColor = (region) => {
+        return REGION_COLORS[region] || { bg: 'rgba(140, 140, 170, 0.08)', border: '#8C8CAA', text: '#6B6B8A' };
+      };
+
+      const getAutomationCount = (article) => {
+        const steps = Array.isArray(article.automationSteps) ? article.automationSteps : [];
+        return Math.max(0, Math.min(5, steps.filter(Boolean).length));
+      };
+
+      const getAutomationPercent = (article) => {
+        return Math.round((getAutomationCount(article) / 5) * 100);
+      };
+
+      const getAutomationColor = (count) => {
+        // count is 0-5 steps completed
+        if (count >= 4) return '#27AE60'; // green for 4-5 steps
+        if (count >= 2) return '#F2994A'; // orange for 2-3 steps
+        return '#E84365'; // red for 0-1 steps
+      };
+
+      const updateAutomationStep = (index, stepIndex, checked) => {
+        const newArticles = [...articles];
+        const article = normalizeArticle(newArticles[index]);
+        const nextSteps = [...article.automationSteps];
+        nextSteps[stepIndex] = checked;
+        newArticles[index] = { ...article, automationSteps: nextSteps };
+        setArticles(newArticles);
+      };
+
+      const updateArticleDate = (articleIndex, dateIndex, newMonth) => {
+        const newArticles = [...articles];
+        const article = newArticles[articleIndex];
+        const newDates = [...(article.dates || [])];
+        const oldDate = new Date(newDates[dateIndex]);
+        const year = oldDate.getFullYear();
+        const day = oldDate.getDate();
+        const newDate = new Date(year, newMonth, day);
+        const pad = (n) => String(n).padStart(2, '0');
+        newDates[dateIndex] = `${newDate.getFullYear()}-${pad(newDate.getMonth() + 1)}-${pad(newDate.getDate())}`;
+        newDates.sort();
+        newArticles[articleIndex] = { ...article, dates: newDates };
+        setArticles(newArticles);
+      };
+
+      const deleteArticle = (index) => {
+        if (confirm('Are you sure you want to delete this article?')) {
+          const newArticles = articles.filter((_, i) => i !== index);
+          setArticles(newArticles);
+        }
+      };
+
+      const filteredArticles = useMemo(() => {
+        return articles.filter(a =>
+          (filterRegions.length === 0 || filterRegions.includes(a.region)) &&
+          (filterCadences.length === 0 || filterCadences.includes(a.cadence)) &&
+          (filterOwners.length === 0 || filterOwners.includes(a.owner))
+        );
+      }, [articles, filterRegions, filterCadences, filterOwners]);
+
+      const groupedArticles = useMemo(() => {
+        const groups = {};
+        filteredArticles.forEach(article => {
+          const key = groupBy === "Owner" ? article.owner : article.region;
+          if (!groups[key]) {
+            groups[key] = [];
+          }
+          groups[key].push(article);
+        });
+        return groups;
+      }, [filteredArticles, groupBy]);
+
+      const stats = useMemo(() => {
+        const totalArticles = filteredArticles.length;
+        const fullyAutomated = filteredArticles.filter(a => getAutomationCount(a) === 5).length;
+        const inProgress = filteredArticles.filter(a => {
+          const count = getAutomationCount(a);
+          return count > 0 && count < 5;
+        }).length;
+        const notStarted = filteredArticles.filter(a => getAutomationCount(a) === 0).length;
+        const avgAutomation = totalArticles > 0
+          ? filteredArticles.reduce((sum, a) => sum + getAutomationCount(a), 0) / totalArticles
+          : 0;
+
+        const articlesPerYear = filteredArticles.reduce((sum, a) => {
+          return sum + (a.dates ? a.dates.length : 0);
+        }, 0);
+
+        return { totalArticles, fullyAutomated, inProgress, notStarted, avgAutomation, articlesPerYear };
+      }, [filteredArticles]);
+
+      // Per-owner overlap detection: owner -> { month -> [article titles] }
+      const ownerOverlapMap = useMemo(() => {
+        const map = {};
+        articles.forEach(article => {
+          if (!map[article.owner]) map[article.owner] = {};
+          (article.dates || []).forEach(dateStr => {
+            const month = new Date(dateStr).getMonth();
+            if (!map[article.owner][month]) map[article.owner][month] = [];
+            if (!map[article.owner][month].includes(article.title)) {
+              map[article.owner][month].push(article.title);
+            }
+          });
+        });
+        return map;
+      }, [articles]);
+
+      const getArticleOverlaps = (article) => {
+        const ownerMonths = ownerOverlapMap[article.owner] || {};
+        const overlapping = [];
+        (article.dates || []).forEach(dateStr => {
+          const month = new Date(dateStr).getMonth();
+          const articlesInMonth = ownerMonths[month] || [];
+          if (articlesInMonth.length > 5 && !overlapping.includes(month)) {
+            overlapping.push(month);
+          }
+        });
+        return overlapping;
+      };
+
+      const regionCounts = useMemo(() => {
+        const counts = {};
+        filteredArticles.forEach(a => {
+          counts[a.region] = (counts[a.region] || 0) + 1;
+        });
+        const maxCount = Math.max(...Object.values(counts), 1);
+        return Object.entries(REGION_COLORS).map(([region, colors]) => ({
+          region,
+          count: counts[region] || 0,
+          color: colors.border,
+          pct: ((counts[region] || 0) / maxCount) * 100
+        }));
+      }, [filteredArticles]);
+
+      const regions = [...new Set(articles.map(a => a.region))].sort();
+      const cadences = ["Monthly", "Quarterly", "Bi-annual", "Annual", "2-year"];
+      const owners = [...new Set(articles.map(a => a.owner))].sort();
+
+      const exportData = () => {
+        const dataStr = JSON.stringify(articles, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'automation-data.json';
+        link.click();
+      };
+
+      const importData = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const imported = JSON.parse(e.target.result);
+              setArticles(imported);
+              alert('Data imported successfully!');
+            } catch (error) {
+              alert('Error importing data. Please check the file format.');
+            }
+          };
+          reader.readAsText(file);
+        }
+      };
+
+      const resetData = () => {
+        if (confirm('Are you sure you want to reset all data to default values? This cannot be undone.')) {
+          const initial = normalizeArticles(INITIAL_ARTICLES);
+          setArticles(initial);
+          localStorage.removeItem('automationArticles');
+          if (SUPABASE_READY) {
+            supabaseClient.from('dashboard_data')
+              .upsert({ id: 'articles', data: initial, updated_at: new Date().toISOString() });
+          }
+          alert('Data reset successfully!');
+        }
+      };
+
+      const AddEditModal = ({ article, onClose, onSave }) => {
+        const [formData, setFormData] = useState(() => {
+          if (article) {
+            return normalizeArticle(article);
+          }
+          return {
+            title: '',
+            region: 'GB',
+            owner: '',
+            cadence: 'Quarterly',
+            automationSteps: STEP_LABELS.map(() => false),
+            dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"],
+            resources: []
+          };
+        });
+
+        const addDate = () => {
+          const currentDates = formData.dates || [];
+          setFormData({ ...formData, dates: [...currentDates, "2026-01-15"].sort() });
+        };
+
+        const removeDate = (index) => {
+          const currentDates = formData.dates || [];
+          setFormData({ ...formData, dates: currentDates.filter((_, i) => i !== index) });
+        };
+
+        const updateDate = (index, newDate) => {
+          const currentDates = [...(formData.dates || [])];
+          currentDates[index] = newDate;
+          setFormData({ ...formData, dates: currentDates.sort() });
+        };
+
+        const handleSave = () => {
+          if (!formData.title || !formData.owner) {
+            alert('Please fill in title and owner');
+            return;
+          }
+          if (!article && (!formData.dates || formData.dates.length === 0)) {
+            alert('Please add at least one publication date');
+            return;
+          }
+          onSave(normalizeArticle(formData));
+        };
+
+        const [newLinkLabel, setNewLinkLabel] = useState('');
+        const [newLinkUrl, setNewLinkUrl] = useState('');
+
+        const addLink = () => {
+          if (!newLinkUrl) return;
+          const label = newLinkLabel || newLinkUrl.replace(/^https?:\/\//, '').split('/').slice(0, 2).join('/');
+          const resources = [...(formData.resources || []), { type: 'link', label, url: newLinkUrl }];
+          setFormData({ ...formData, resources });
+          setNewLinkLabel('');
+          setNewLinkUrl('');
+        };
+
+        const addFile = (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const resources = [...(formData.resources || []), { type: 'file', label: file.name, data: e.target.result, size: file.size }];
+            setFormData({ ...formData, resources });
+          };
+          reader.readAsDataURL(file);
+          event.target.value = '';
+        };
+
+        const removeResource = (index) => {
+          const resources = (formData.resources || []).filter((_, i) => i !== index);
+          setFormData({ ...formData, resources });
+        };
+
+        return (
+          <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h2 style={{ fontSize: '22px', fontWeight: '600', marginBottom: '24px', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+                {article ? 'Edit Article' : 'Add New Article'}
+              </h2>
+
+              <div className="form-group">
+                <label className="form-label">Article Title *</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="e.g., Battery Revenue Performance"
+                  style={{ width: '100%' }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Region *</label>
+                <select
+                  value={formData.region}
+                  onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                  style={{ width: '100%' }}
+                >
+                  {Object.keys(REGION_COLORS).map(region => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Subregion</label>
+                <input
+                  type="text"
+                  value={formData.subregion || ''}
+                  onChange={(e) => setFormData({ ...formData, subregion: e.target.value || undefined })}
+                  placeholder="e.g., Germany, NYISO, NEM (optional)"
+                  style={{ width: '100%' }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Owner *</label>
+                <input
+                  type="text"
+                  value={formData.owner}
+                  onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
+                  placeholder="e.g., Zach J"
+                  style={{ width: '100%' }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Cadence</label>
+                <select
+                  value={formData.cadence}
+                  onChange={(e) => setFormData({ ...formData, cadence: e.target.value })}
+                  style={{ width: '100%' }}
+                >
+                  <option value="Monthly">Monthly</option>
+                  <option value="Quarterly">Quarterly</option>
+                  <option value="Bi-annual">Bi-annual</option>
+                  <option value="Annual">Annual</option>
+                  <option value="2-year">2-year</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Automation Steps</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+                  {STEP_LABELS.map((label, idx) => {
+                    const checked = !!(formData.automationSteps || [])[idx];
+                    return (
+                      <label key={label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            const nextSteps = [...(formData.automationSteps || STEP_LABELS.map(() => false))];
+                            nextSteps[idx] = e.target.checked;
+                            setFormData({ ...formData, automationSteps: nextSteps });
+                          }}
+                        />
+                        <span>{label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--text-secondary)', fontFamily: "'DM Sans', sans-serif" }}>
+                  Automation score: <span style={{ color: getAutomationColor(getAutomationCount(formData)), fontWeight: '600' }}>{getAutomationCount(formData)}/5 ({getAutomationPercent(formData)}%)</span>
+                </div>
+              </div>
+
+              {!article && (
+                <div className="form-group">
+                  <label className="form-label">Publication Dates *</label>
+                  <div className="date-input-grid">
+                    {(formData.dates || []).map((date, idx) => (
+                      <div key={idx} className="date-input-wrapper">
+                        <input
+                          type="date"
+                          value={date}
+                          onChange={(e) => updateDate(idx, e.target.value)}
+                        />
+                        <button type="button" onClick={() => removeDate(idx)}>X</button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addDate}
+                    style={{
+                      marginTop: '8px',
+                      padding: '7px 14px',
+                      background: 'transparent',
+                      color: 'var(--purple)',
+                      border: '1px solid var(--purple)',
+                      borderRadius: '4px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontFamily: "'DM Sans', sans-serif",
+                      letterSpacing: '0.2px'
+                    }}
+                  >
+                    + Add Date
+                  </button>
+                </div>
+              )}
+
+              {/* Resources Section */}
+              <div className="form-group">
+                <label className="form-label">Resources</label>
+                <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginBottom: '8px' }}>Add links to repos, docs, or upload files for this article</div>
+
+                {/* Existing resources list */}
+                {(formData.resources || []).length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+                    {(formData.resources || []).map((res, rIdx) => (
+                      <div key={rIdx} style={{
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        padding: '8px 10px', background: 'var(--bg-surface-2)',
+                        borderRadius: '4px', border: '1px solid var(--border-default)'
+                      }}>
+                        <span style={{ fontSize: '12px', color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: '500' }}>
+                          {res.label}
+                        </span>
+                        {res.type === 'file' && res.size && (
+                          <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', flexShrink: 0 }}>{(res.size / 1024).toFixed(0)} KB</span>
+                        )}
+                        {res.type === 'link' ? (
+                          <a
+                            href={res.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              padding: '3px 10px', background: 'var(--purple)', color: '#FFFFFF',
+                              border: '1px solid var(--purple)', borderRadius: '4px',
+                              fontSize: '10px', fontWeight: '600', cursor: 'pointer',
+                              textDecoration: 'none', fontFamily: "'DM Sans', sans-serif",
+                              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px'
+                            }}
+                          >
+                            <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+                              <path d="M6.5 3.5H3.5C2.95 3.5 2.5 3.95 2.5 4.5V12.5C2.5 13.05 2.95 13.5 3.5 13.5H11.5C12.05 13.5 12.5 13.05 12.5 12.5V9.5M9.5 2.5H13.5M13.5 2.5V6.5M13.5 2.5L6.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            Open
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const link = document.createElement('a');
+                              link.href = res.data;
+                              link.download = res.label;
+                              link.click();
+                            }}
+                            style={{
+                              padding: '3px 10px', background: 'var(--purple)', color: '#FFFFFF',
+                              border: '1px solid var(--purple)', borderRadius: '4px',
+                              fontSize: '10px', fontWeight: '600', cursor: 'pointer',
+                              fontFamily: "'DM Sans', sans-serif", flexShrink: 0,
+                              display: 'inline-flex', alignItems: 'center', gap: '4px'
+                            }}
+                          >
+                            <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+                              <path d="M2.5 10.5V12.5C2.5 13.05 2.95 13.5 3.5 13.5H12.5C13.05 13.5 13.5 13.05 13.5 12.5V10.5M8 2.5V10.5M8 10.5L5 7.5M8 10.5L11 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            Download
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeResource(rIdx)}
+                          style={{
+                            padding: '2px 6px', background: 'var(--status-none-bg)',
+                            color: 'var(--status-none)', border: '1px solid rgba(232, 67, 101, 0.2)',
+                            borderRadius: '4px', fontSize: '9px', cursor: 'pointer', flexShrink: 0
+                          }}
+                        >X</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add link form */}
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                  <input
+                    type="text"
+                    value={newLinkLabel}
+                    onChange={(e) => setNewLinkLabel(e.target.value)}
+                    placeholder="Label (optional)"
+                    style={{ flex: '0 1 140px', fontSize: '12px', padding: '6px 8px' }}
+                  />
+                  <input
+                    type="text"
+                    value={newLinkUrl}
+                    onChange={(e) => setNewLinkUrl(e.target.value)}
+                    placeholder="https://github.com/..."
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLink(); } }}
+                    style={{ flex: 1, fontSize: '12px', padding: '6px 8px', minWidth: '180px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={addLink}
+                    style={{
+                      padding: '6px 12px', background: 'transparent', color: 'var(--purple)',
+                      border: '1px solid var(--purple)', borderRadius: '4px',
+                      fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+                      fontFamily: "'DM Sans', sans-serif"
+                    }}
+                  >+ Link</button>
+                </div>
+
+                {/* Upload file button */}
+                <label style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 12px', background: 'transparent', color: 'var(--purple)',
+                  border: '1px solid var(--purple)', borderRadius: '4px',
+                  fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  + Upload File
+                  <input type="file" onChange={addFile} style={{ display: 'none' }} />
+                </label>
+              </div>
+
+              <div className="button-group">
+                <button
+                  onClick={handleSave}
+                  style={{
+                    flex: 1,
+                    padding: '12px 24px',
+                    background: 'var(--purple)',
+                    color: '#FFFFFF',
+                    border: '1px solid var(--purple)',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                    boxShadow: '0 1px 3px rgba(112,95,230,0.3)',
+                    letterSpacing: '0.2px'
+                  }}
+                >
+                  {article ? 'Save Changes' : 'Add Article'}
+                </button>
+                <button
+                  onClick={onClose}
+                  style={{
+                    flex: 1,
+                    padding: '12px 24px',
+                    background: '#FFFFFF',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                    boxShadow: 'var(--shadow)'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const handleAddArticle = (formData) => {
+        setArticles([...articles, formData]);
+        setShowAddModal(false);
+      };
+
+      const handleEditArticle = (formData) => {
+        const newArticles = [...articles];
+        const index = articles.findIndex(a =>
+          a.title === editingArticle.title &&
+          a.region === editingArticle.region &&
+          a.owner === editingArticle.owner
+        );
+        if (index !== -1) {
+          newArticles[index] = formData;
+          setArticles(newArticles);
+        }
+        setEditingArticle(null);
+      };
+
+      const ArticleRow = ({ article, originalIndex, overlaps }) => {
+        const regionColor = getRegionColor(article.region);
+        const timelineRef = useRef(null);
+        const dragRef = useRef({ active: false, dateIndex: null, didDrag: false });
+        const [dragState, setDragState] = useState({ active: false, dateIndex: null, currentMonth: null });
+        const [showResources, setShowResources] = useState(false);
+
+        const getMonthFromX = useCallback((clientX) => {
+          if (!timelineRef.current) return 0;
+          const rect = timelineRef.current.getBoundingClientRect();
+          const relX = clientX - rect.left;
+          const ratio = relX / rect.width;
+          const month = Math.round(ratio * 12 - 0.5);
+          return Math.max(0, Math.min(11, month));
+        }, []);
+
+        const handleDotMouseDown = useCallback((e, dateIndex) => {
+          e.preventDefault();
+          dragRef.current = { active: true, dateIndex, didDrag: false };
+          const currentMonth = new Date((article.dates || [])[dateIndex]).getMonth();
+          setDragState({ active: true, dateIndex, currentMonth });
+
+          const handleMouseMove = (moveEvent) => {
+            if (!dragRef.current.active) return;
+            dragRef.current.didDrag = true;
+            const newMonth = getMonthFromX(moveEvent.clientX);
+            setDragState(prev => ({ ...prev, currentMonth: newMonth }));
+          };
+
+          const handleMouseUp = (upEvent) => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            if (dragRef.current.didDrag) {
+              const finalMonth = getMonthFromX(upEvent.clientX);
+              updateArticleDate(originalIndex, dragRef.current.dateIndex, finalMonth);
+            }
+            setDragState({ active: false, dateIndex: null, currentMonth: null });
+            // Keep didDrag true briefly so click handler can check it
+            setTimeout(() => { dragRef.current = { active: false, dateIndex: null, didDrag: false }; }, 10);
+          };
+
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
+        }, [article.dates, originalIndex, getMonthFromX]);
+
+        const handleDotClick = useCallback((e) => {
+          if (dragRef.current.didDrag) {
+            e.stopPropagation();
+            return;
+          }
+          setEditingArticle(article);
+        }, [article]);
+
+        return (
+          <div style={{ position: 'relative', padding: '10px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+            <div style={{
+              fontSize: '11px',
+              color: 'var(--text-secondary)',
+              marginBottom: '6px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '6px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span className="region-badge" style={{
+                  background: regionColor.bg,
+                  color: regionColor.text,
+                  border: `1px solid ${regionColor.border}30`
+                }}>
+                  {article.subregion || article.region}
+                </span>
+                <span style={{ fontWeight: '500', color: 'var(--text-primary)', fontSize: '13px', fontFamily: "'DM Sans', sans-serif" }}>{article.title}</span>
+                <span style={{ color: 'var(--text-tertiary)', fontSize: '10px' }}>({article.cadence})</span>
+                {(article.resources || []).length > 0 && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowResources(!showResources); }}
+                    style={{
+                      fontSize: '9px',
+                      padding: '1px 6px',
+                      background: showResources ? 'var(--purple-light)' : 'var(--bg-surface-2)',
+                      color: showResources ? 'var(--purple)' : 'var(--text-tertiary)',
+                      border: `1px solid ${showResources ? 'var(--purple)' : 'var(--border-default)'}`,
+                      borderRadius: '4px',
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {(article.resources || []).length} resource{(article.resources || []).length !== 1 ? 's' : ''}
+                  </button>
+                )}
+                {overlaps && overlaps.length > 0 && (
+                  <span style={{
+                    fontSize: '9px',
+                    padding: '1px 6px',
+                    background: 'var(--status-progress-bg)',
+                    color: 'var(--status-progress)',
+                    border: '1px solid rgba(242, 153, 74, 0.2)',
+                    borderRadius: '4px',
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: '600'
+                  }}
+                    title={`More than 5 articles in: ${overlaps.map(m => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m]).join(', ')}`}
+                  >
+                    {overlaps.length} overlap{overlaps.length > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                {editMode && (
+                  <span style={{ fontWeight: '600', color: getAutomationColor(getAutomationCount(article)), fontSize: '11px', fontFamily: "'DM Sans', sans-serif" }}>
+                    {getAutomationCount(article)}/5 ({getAutomationPercent(article)}%)
+                  </span>
+                )}
+                <button
+                  onClick={() => setEditingArticle(article)}
+                  style={{
+                    padding: '3px 8px',
+                    background: 'var(--button-bg)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--button-border)',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteArticle(originalIndex)}
+                  style={{
+                    padding: '3px 8px',
+                    background: 'transparent',
+                    color: 'var(--text-tertiary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--status-none)';
+                    e.currentTarget.style.borderColor = 'rgba(232, 67, 101, 0.3)';
+                    e.currentTarget.style.background = 'var(--status-none-bg)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--text-tertiary)';
+                    e.currentTarget.style.borderColor = 'var(--border-default)';
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            {editMode ? (
+              <div style={{ background: 'var(--bg-surface-2)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+                  {STEP_LABELS.map((label, stepIdx) => {
+                    const checked = !!(article.automationSteps || [])[stepIdx];
+                    return (
+                      <label key={label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => updateAutomationStep(originalIndex, stepIdx, e.target.checked)}
+                        />
+                        <span>{label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', fontFamily: "'DM Sans', sans-serif" }}>
+                  Automation score: <span style={{ color: getAutomationColor(getAutomationCount(article)) }}>{getAutomationCount(article)}/5 ({getAutomationPercent(article)}%)</span>
+                </div>
+              </div>
+            ) : (
+              <div ref={timelineRef} style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(12, 1fr)',
+                gap: '3px',
+                userSelect: 'none'
+              }}>
+                {(() => {
+                  const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  const automationColor = getAutomationColor(getAutomationCount(article));
+                  const dates = article.dates || [];
+
+                  // Build month -> [dateIndex] map
+                  const monthDateMap = {};
+                  dates.forEach((d, idx) => {
+                    const m = new Date(d).getMonth();
+                    if (!monthDateMap[m]) monthDateMap[m] = [];
+                    monthDateMap[m].push(idx);
+                  });
+
+                  return Array.from({ length: 12 }, (_, monthIdx) => {
+                    // Filter out the date being dragged from its source month
+                    const dateIndices = (monthDateMap[monthIdx] || []).filter(idx =>
+                      !(dragState.active && dragState.dateIndex === idx)
+                    );
+
+                    const isDragTarget = dragState.active && dragState.currentMonth === monthIdx;
+                    const hasDate = dateIndices.length > 0;
+                    const isOccupied = hasDate || isDragTarget;
+                    const draggableDateIndex = hasDate ? dateIndices[0] : null;
+
+                    return (
+                      <div
+                        key={monthIdx}
+                        onClick={() => {
+                          if (hasDate && !dragRef.current.didDrag) {
+                            setEditingArticle(article);
+                          }
+                        }}
+                        onMouseDown={(e) => {
+                          if (draggableDateIndex !== null) {
+                            handleDotMouseDown(e, draggableDateIndex);
+                          }
+                        }}
+                        style={{
+                          height: '32px',
+                          borderRadius: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '9px',
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: isOccupied ? '600' : '400',
+                          letterSpacing: '0.02em',
+                          cursor: hasDate ? (dragState.active ? 'grabbing' : 'grab') : 'default',
+                          transition: dragState.active ? 'background 0.1s ease, border 0.1s ease' : 'all 0.15s ease',
+                          background: isOccupied
+                            ? `${automationColor}18`
+                            : '#FFFFFF',
+                          border: isOccupied
+                            ? `1.5px solid ${regionColor.border}66`
+                            : `1px solid var(--border-default)`,
+                          color: isOccupied
+                            ? 'var(--text-primary)'
+                            : 'var(--text-tertiary)',
+                          boxShadow: isDragTarget
+                            ? `0 0 0 2px ${automationColor}40`
+                            : isOccupied
+                              ? 'var(--shadow)'
+                              : 'none',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (hasDate && !dragState.active) {
+                            e.currentTarget.style.background = `${automationColor}28`;
+                            e.currentTarget.style.borderColor = regionColor.border;
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (hasDate && !dragState.active) {
+                            e.currentTarget.style.background = `${automationColor}18`;
+                            e.currentTarget.style.borderColor = `${regionColor.border}66`;
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow)';
+                          }
+                        }}
+                        title={hasDate
+                          ? `${dates[draggableDateIndex]} — click to edit, drag to move`
+                          : isDragTarget
+                            ? `Drop to move here`
+                            : monthLabels[monthIdx]}
+                      >
+                        {monthLabels[monthIdx]}
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            )}
+
+            {/* Resources Panel */}
+            {showResources && (article.resources || []).length > 0 && (
+              <div style={{ marginTop: '8px', padding: '10px 14px', background: 'var(--bg-surface-2)', borderRadius: '6px', border: '1px solid var(--border-default)' }}>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '8px' }}>Resources</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {(article.resources || []).map((res, rIdx) => (
+                    <div key={rIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {res.type === 'link' ? (
+                        <a
+                          href={res.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--purple)',
+                            textDecoration: 'none',
+                            fontWeight: '500',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none'; }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M6.5 3.5H3.5C2.95 3.5 2.5 3.95 2.5 4.5V12.5C2.5 13.05 2.95 13.5 3.5 13.5H11.5C12.05 13.5 12.5 13.05 12.5 12.5V9.5M9.5 2.5H13.5M13.5 2.5V6.5M13.5 2.5L6.5 9.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          {res.label}
+                        </a>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M4 1.5H9.5L12.5 4.5V14.5H4C3.45 14.5 3 14.05 3 13.5V2.5C3 1.95 3.45 1.5 4 1.5Z" stroke="var(--text-tertiary)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M9.5 1.5V4.5H12.5" stroke="var(--text-tertiary)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>{res.label}</span>
+                          {res.size && <span style={{ fontSize: '9px', color: 'var(--text-tertiary)' }}>({(res.size / 1024).toFixed(0)} KB)</span>}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const link = document.createElement('a');
+                              link.href = res.data;
+                              link.download = res.label;
+                              link.click();
+                            }}
+                            style={{
+                              fontSize: '10px',
+                              padding: '3px 10px',
+                              background: 'var(--purple)',
+                              color: '#FFFFFF',
+                              border: '1px solid var(--purple)',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontWeight: '600',
+                              fontFamily: "'DM Sans', sans-serif",
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              marginLeft: 'auto',
+                              flexShrink: 0
+                            }}
+                          >
+                            <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+                              <path d="M2.5 10.5V12.5C2.5 13.05 2.95 13.5 3.5 13.5H12.5C13.05 13.5 13.5 13.05 13.5 12.5V10.5M8 2.5V10.5M8 10.5L5 7.5M8 10.5L11 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            Download
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      if (loading) {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '700', letterSpacing: '6px', color: 'var(--purple)' }}>MODO ENERGY</div>
+            <div style={{ fontSize: '14px', color: 'var(--text-tertiary)' }}>Loading dashboard...</div>
+          </div>
+        );
+      }
+
+      return (
+        <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '24px' }}>
+          {/* Top Bar Card */}
+          <div style={{
+            background: '#FFFFFF',
+            padding: '24px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            border: '1px solid var(--border-default)',
+            borderTop: '3px solid var(--purple)',
+            boxShadow: 'var(--shadow)'
+          }}>
+            {/* Title Row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+              <div>
+                <div style={{ fontSize: '13px', fontWeight: '700', letterSpacing: '6px', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: '6px' }}>MODO ENERGY</div>
+                <h1 style={{ fontSize: '22px', fontWeight: '600', marginBottom: '4px', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+                  Article Automation Dashboard 2026
+                </h1>
+                <p style={{ color: 'var(--text-tertiary)', fontSize: '14px', fontWeight: '400', lineHeight: '1.6' }}>
+                  Track automation progress across all repeater articles
+                  {syncStatus && (
+                    <span style={{
+                      marginLeft: '12px', fontSize: '10px', fontWeight: '600',
+                      padding: '2px 8px', borderRadius: '4px',
+                      background: syncStatus === 'Synced' ? 'var(--status-complete-bg)' : syncStatus === 'Saving...' ? 'var(--status-progress-bg)' : 'var(--status-none-bg)',
+                      color: syncStatus === 'Synced' ? 'var(--status-complete)' : syncStatus === 'Saving...' ? 'var(--status-progress)' : 'var(--status-none)',
+                      border: `1px solid ${syncStatus === 'Synced' ? 'rgba(39,174,96,0.2)' : syncStatus === 'Saving...' ? 'rgba(242,153,74,0.2)' : 'rgba(232,67,101,0.2)'}`
+                    }}>
+                      {syncStatus}
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  style={{
+                    padding: '7px 14px',
+                    background: 'var(--button-bg)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--button-border)',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow)',
+                    letterSpacing: '0.2px'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--button-border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
+                >
+                  Add Article
+                </button>
+                <button
+                  onClick={() => setEditMode(!editMode)}
+                  style={{
+                    padding: '7px 14px',
+                    background: editMode ? 'var(--purple-light)' : 'var(--button-bg)',
+                    color: editMode ? 'var(--purple)' : 'var(--text-secondary)',
+                    border: `1px solid ${editMode ? 'var(--purple)' : 'var(--button-border)'}`,
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => { if (!editMode) { e.currentTarget.style.background = 'var(--button-hover)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.color = 'var(--text-primary)'; } }}
+                  onMouseLeave={(e) => { if (!editMode) { e.currentTarget.style.background = 'var(--button-bg)'; e.currentTarget.style.borderColor = 'var(--button-border)'; e.currentTarget.style.color = 'var(--text-secondary)'; } }}
+                >
+                  {editMode ? 'Done' : 'Edit'}
+                </button>
+                <button
+                  onClick={exportData}
+                  style={{
+                    padding: '7px 14px',
+                    background: 'var(--button-bg)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--button-border)',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow)',
+                    letterSpacing: '0.2px'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--button-border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
+                >
+                  Export
+                </button>
+                <label style={{
+                  padding: '7px 14px',
+                  background: 'var(--button-bg)',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--button-border)',
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  transition: 'all 150ms ease',
+                  fontFamily: "'DM Sans', sans-serif",
+                  boxShadow: 'var(--shadow)',
+                  letterSpacing: '0.2px'
+                }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--button-border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
+                >
+                  Import
+                  <input type="file" accept=".json" onChange={importData} style={{ display: 'none' }} />
+                </label>
+                <button
+                  onClick={resetData}
+                  style={{
+                    padding: '7px 14px',
+                    background: 'var(--button-bg)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid rgba(232, 67, 101, 0.3)',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--status-none-bg)'; e.currentTarget.style.borderColor = 'var(--status-none)'; e.currentTarget.style.color = 'var(--status-none)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--button-bg)'; e.currentTarget.style.borderColor = 'rgba(232, 67, 101, 0.3)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            {/* Charts + Stats Row */}
+            <div style={{ display: 'flex', gap: '20px', alignItems: 'stretch', flexWrap: 'wrap' }}>
+
+              {/* Automation Donut Chart */}
+              <div style={{ background: 'var(--bg-surface-2)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', minWidth: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px', alignSelf: 'flex-start' }}>Automation Status</div>
+                <svg viewBox="0 0 120 120" style={{ width: '110px', height: '110px' }}>
+                  {(() => {
+                    const total = stats.totalArticles || 1;
+                    const r = 45;
+                    const circumference = 2 * Math.PI * r;
+                    const segments = [
+                      { count: stats.fullyAutomated, color: '#27AE60' },
+                      { count: stats.inProgress, color: '#F2994A' },
+                      { count: stats.notStarted, color: '#E84365' },
+                    ];
+                    let offset = 0;
+                    return segments.map((seg, i) => {
+                      const dash = (seg.count / total) * circumference;
+                      const el = (
+                        <circle
+                          key={i}
+                          cx="60" cy="60" r={r}
+                          fill="none"
+                          stroke={seg.color}
+                          strokeWidth="14"
+                          strokeDasharray={`${dash} ${circumference - dash}`}
+                          strokeDashoffset={-offset}
+                          strokeLinecap="butt"
+                          transform="rotate(-90 60 60)"
+                        />
+                      );
+                      offset += dash;
+                      return el;
+                    });
+                  })()}
+                  <text x="60" y="56" textAnchor="middle" style={{ fontSize: '18px', fontWeight: '700', fill: 'var(--text-primary)' }}>{stats.totalArticles}</text>
+                  <text x="60" y="70" textAnchor="middle" style={{ fontSize: '9px', fontWeight: '500', fill: 'var(--text-tertiary)' }}>articles</text>
+                </svg>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '10px', width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#27AE60', flexShrink: 0 }}></div>
+                    <span style={{ color: 'var(--text-secondary)' }}>Automated</span>
+                    <span style={{ marginLeft: 'auto', fontWeight: '600', color: 'var(--text-primary)' }}>{stats.fullyAutomated}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F2994A', flexShrink: 0 }}></div>
+                    <span style={{ color: 'var(--text-secondary)' }}>In Progress</span>
+                    <span style={{ marginLeft: 'auto', fontWeight: '600', color: 'var(--text-primary)' }}>{stats.inProgress}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E84365', flexShrink: 0 }}></div>
+                    <span style={{ color: 'var(--text-secondary)' }}>Not Started</span>
+                    <span style={{ marginLeft: 'auto', fontWeight: '600', color: 'var(--text-primary)' }}>{stats.notStarted}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Articles by Region Bar Chart */}
+              <div style={{ background: 'var(--bg-surface-2)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', minWidth: '220px', flex: '0 1 280px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px' }}>Articles by Region</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {regionCounts.map(({ region, count, color, pct }) => (
+                    <div key={region}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                        <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>{region}</span>
+                        <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{count}</span>
+                      </div>
+                      <div style={{ height: '8px', background: '#FFFFFF', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--border-default)' }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '4px', transition: 'width 0.3s ease' }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Region Legend */}
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '8px', padding: '8px 0' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '4px' }}>Regions</div>
+                {Object.entries(REGION_COLORS).map(([region, colors]) => (
+                  <div key={region} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '10px', height: '10px', background: colors.border, borderRadius: '50%' }}></div>
+                    <span style={{ fontSize: '11px', fontWeight: '500', color: 'var(--text-secondary)' }}>{region}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar + Main Content */}
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+
+            {/* Left Sidebar - Filters */}
+            <div style={{ width: '240px', flexShrink: 0, position: 'sticky', top: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ background: '#FFFFFF', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Filters</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Region</label>
+                    <MultiSelectDropdown options={regions} selected={filterRegions} setSelected={setFilterRegions} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Cadence</label>
+                    <MultiSelectDropdown options={cadences} selected={filterCadences} setSelected={setFilterCadences} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Author</label>
+                    <MultiSelectDropdown options={owners} selected={filterOwners} setSelected={setFilterOwners} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Group by</label>
+                    <select
+                      value={groupBy}
+                      onChange={(e) => setGroupBy(e.target.value)}
+                      style={{ padding: '4px 10px', borderRadius: '4px', border: '1px solid var(--border-default)', fontSize: '12px', background: 'var(--input-bg)', color: 'var(--text-primary)', width: '100%' }}
+                    >
+                      <option value="Region">Region</option>
+                      <option value="Owner">Author</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dashboard Guide */}
+              <div style={{ background: '#FFFFFF', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
+                <div style={{ fontWeight: '600', marginBottom: '8px', color: 'var(--text-tertiary)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Guide</div>
+                <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--text-tertiary)', fontSize: '10px', lineHeight: '1.8' }}>
+                  <li><strong style={{ color: 'var(--text-secondary)' }}>Headers:</strong> Click to expand/collapse</li>
+                  <li><strong style={{ color: 'var(--text-secondary)' }}>Timeline:</strong> Drag blocks to move dates</li>
+                  <li><strong style={{ color: 'var(--text-secondary)' }}>Edit Mode:</strong> Tick automation steps</li>
+                  <li><strong style={{ color: 'var(--text-secondary)' }}>Export/Import:</strong> Save & restore data</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Right Main Content */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Collapsible Group Sections */}
+            {Object.entries(groupedArticles).sort(([a], [b]) => a.localeCompare(b)).map(([groupKey, groupArticles]) => {
+              const isRegionGroup = groupBy === "Region";
+              const groupColor = isRegionGroup
+                ? getRegionColor(groupKey)
+                : { bg: '#FFFFFF', border: 'var(--text-secondary)', text: 'var(--text-primary)' };
+              const groupStats = {
+                total: groupArticles.length,
+                automated: groupArticles.filter(a => getAutomationCount(a) === 5).length,
+                avgAutomation: (groupArticles.reduce((sum, a) => sum + getAutomationCount(a), 0) / groupArticles.length).toFixed(1)
+              };
+
+              // Count months with overlapping articles for owners in this group
+              const overlapMonthCount = (() => {
+                const ownersInGroup = isRegionGroup
+                  ? [...new Set(groupArticles.map(a => a.owner))]
+                  : [groupKey];
+                let count = 0;
+                ownersInGroup.forEach(owner => {
+                  const months = ownerOverlapMap[owner] || {};
+                  Object.values(months).forEach(titles => {
+                    if (titles.length > 5) count++;
+                  });
+                });
+                return count;
+              })();
+
+              return (
+                <div key={groupKey} className="collapsible-section" style={{ marginBottom: '16px' }}>
+                  <div
+                    className="collapsible-header"
+                    onClick={() => setCollapsedGroups(prev => ({ ...prev, [groupKey]: !prev[groupKey] }))}
+                    style={{
+                      background: '#FFFFFF',
+                      borderLeft: isRegionGroup ? `3px solid ${groupColor.border}` : '3px solid var(--text-secondary)',
+                      borderBottom: collapsedGroups[groupKey] ? 'none' : '1px solid var(--border-default)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: isRegionGroup ? groupColor.text : 'var(--text-primary)', fontFamily: "'DM Sans', sans-serif" }}>{groupKey}</span>
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '2px 6px',
+                        background: 'var(--bg-surface-2)',
+                        borderRadius: '4px',
+                        color: 'var(--text-secondary)',
+                        fontWeight: '500',
+                        border: '1px solid var(--border-default)',
+                        fontFamily: "'DM Sans', sans-serif"
+                      }}>
+                        {groupStats.total} articles
+                      </span>
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '2px 6px',
+                        background: groupStats.avgAutomation >= 4 ? 'var(--status-complete-bg)' : groupStats.avgAutomation >= 2 ? 'var(--status-progress-bg)' : 'var(--status-none-bg)',
+                        borderRadius: '4px',
+                        color: groupStats.avgAutomation >= 4 ? 'var(--status-complete)' : groupStats.avgAutomation >= 2 ? 'var(--status-progress)' : 'var(--status-none)',
+                        fontWeight: '600',
+                        border: `1px solid ${groupStats.avgAutomation >= 4 ? 'rgba(39, 174, 96, 0.2)' : groupStats.avgAutomation >= 2 ? 'rgba(242, 153, 74, 0.2)' : 'rgba(232, 67, 101, 0.2)'}`,
+                        fontFamily: "'DM Sans', sans-serif"
+                      }}>
+                        {Math.round(groupStats.avgAutomation)}/5
+                      </span>
+                      {overlapMonthCount > 0 && (
+                        <span style={{
+                          fontSize: '10px',
+                          padding: '2px 6px',
+                          background: 'var(--status-progress-bg)',
+                          borderRadius: '4px',
+                          color: 'var(--status-progress)',
+                          fontWeight: '600',
+                          border: '1px solid rgba(242, 153, 74, 0.2)',
+                          fontFamily: "'DM Sans', sans-serif"
+                        }}>
+                          {overlapMonthCount} mo. overlap
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', fontWeight: '500' }}>
+                        {groupStats.automated} fully automated
+                      </span>
+                      <span className={`chevron${collapsedGroups[groupKey] ? '' : ' open'}`} style={{ fontSize: '16px', color: 'var(--text-tertiary)' }}>&rsaquo;</span>
+                    </div>
+                  </div>
+
+                  <div className={`collapsible-content${collapsedGroups[groupKey] ? '' : ' open'}`} style={{ paddingTop: '8px' }}>
+                    {groupArticles.map((article, idx) => {
+                      const originalIndex = articles.findIndex(a =>
+                        a.title === article.title &&
+                        a.region === article.region &&
+                        a.owner === article.owner &&
+                        a.cadence === article.cadence &&
+                        JSON.stringify(a.dates) === JSON.stringify(article.dates)
+                      );
+                      return <ArticleRow key={idx} article={article} originalIndex={originalIndex} overlaps={getArticleOverlaps(article)} />;
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+            </div>
+          </div>
+
+          {showAddModal && (
+            <AddEditModal
+              onClose={() => setShowAddModal(false)}
+              onSave={handleAddArticle}
+            />
+          )}
+
+          {editingArticle && (
+            <AddEditModal
+              article={editingArticle}
+              onClose={() => setEditingArticle(null)}
+              onSave={handleEditArticle}
+            />
+          )}
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [authenticated, setAuthenticated] = useState(() => {
+        return !DASHBOARD_PASSWORD || sessionStorage.getItem('dashboard_auth') === 'true';
+      });
+
+      if (!authenticated) {
+        return <PasswordGate onSuccess={() => setAuthenticated(true)} />;
+      }
+
+      return <AutomationDashboard />;
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
