@@ -681,7 +681,15 @@
       const [articles, setArticles] = useState(() => {
         const saved = localStorage.getItem('automationArticles');
         const baseArticles = saved ? JSON.parse(saved) : INITIAL_ARTICLES;
-        return normalizeArticles(baseArticles);
+        // Backfill subregions from INITIAL_ARTICLES
+        const migrated = baseArticles.map(article => {
+          if (article.subregion) return article;
+          const match = INITIAL_ARTICLES.find(ia =>
+            ia.title === article.title && ia.region === article.region && ia.subregion
+          );
+          return match ? { ...article, subregion: match.subregion } : article;
+        });
+        return normalizeArticles(migrated);
       });
       const [loading, setLoading] = useState(SUPABASE_READY);
       const [syncStatus, setSyncStatus] = useState(SUPABASE_READY ? 'Connecting...' : '');
@@ -707,7 +715,15 @@
             const { data, error } = await supabaseClient
               .from('dashboard_data').select('data').eq('id', 'articles').single();
             if (data?.data) {
-              setArticles(normalizeArticles(data.data));
+              // Backfill subregions from INITIAL_ARTICLES for articles missing them
+              const migrated = data.data.map(article => {
+                if (article.subregion) return article;
+                const match = INITIAL_ARTICLES.find(ia =>
+                  ia.title === article.title && ia.region === article.region && ia.subregion
+                );
+                return match ? { ...article, subregion: match.subregion } : article;
+              });
+              setArticles(normalizeArticles(migrated));
               setSyncStatus('Synced');
             } else if (error && error.code === 'PGRST116') {
               // No row yet — seed with current data
