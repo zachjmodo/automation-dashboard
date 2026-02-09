@@ -1962,7 +1962,16 @@
             {/* Right Main Content */}
             <div style={{ flex: 1, minWidth: 0 }}>
             {/* Collapsible Group Sections */}
-            {Object.entries(groupedArticles).sort(([a], [b]) => a.localeCompare(b)).map(([groupKey, groupArticles]) => {
+            {Object.entries(groupedArticles).sort(([a, aArticles], [b, bArticles]) => {
+              if (groupBy !== "Region") return a.localeCompare(b);
+              const regionOrder = Object.keys(REGION_COLORS);
+              const aRegion = aArticles[0]?.region || a;
+              const bRegion = bArticles[0]?.region || b;
+              const aIdx = regionOrder.indexOf(aRegion);
+              const bIdx = regionOrder.indexOf(bRegion);
+              if (aIdx !== bIdx) return aIdx - bIdx;
+              return a.localeCompare(b);
+            }).map(([groupKey, groupArticles]) => {
               const isRegionGroup = groupBy === "Region";
               const groupRegion = isRegionGroup ? (groupArticles[0]?.region || groupKey) : null;
               const groupColor = isRegionGroup
