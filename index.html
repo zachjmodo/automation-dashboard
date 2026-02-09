@@ -2627,28 +2627,42 @@
           <div className="sidebar-main-wrapper" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', ...(isMobile && mobileTab !== 'articles' && mobileTab !== 'calendar' ? { display: 'none' } : {}) }}>
 
             {/* Left Sidebar - Filters */}
-            <div className="sidebar" style={{ width: '240px', flexShrink: 0, position: 'sticky', top: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ background: '#FFFFFF', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
-                <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Filters</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="sidebar" style={{ width: '220px', flexShrink: 0, position: 'sticky', top: '24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ background: '#FFFFFF', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Filters</div>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={() => { setFilterRegions([]); setFilterCadences([]); setFilterOwners([]); }}
+                      style={{
+                        background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                        fontSize: '10px', fontWeight: '500', color: 'var(--purple)',
+                        fontFamily: "'DM Sans', sans-serif"
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none'; }}
+                    >Clear all</button>
+                  )}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Region</label>
+                    <label style={{ fontSize: '10px', fontWeight: '600', display: 'block', marginBottom: '4px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Region</label>
                     <MultiSelectDropdown options={regions} selected={filterRegions} setSelected={setFilterRegions} indentSet={subregionSet} />
                   </div>
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Cadence</label>
+                    <label style={{ fontSize: '10px', fontWeight: '600', display: 'block', marginBottom: '4px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Cadence</label>
                     <MultiSelectDropdown options={cadences} selected={filterCadences} setSelected={setFilterCadences} />
                   </div>
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Author</label>
+                    <label style={{ fontSize: '10px', fontWeight: '600', display: 'block', marginBottom: '4px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Author</label>
                     <MultiSelectDropdown options={owners} selected={filterOwners} setSelected={setFilterOwners} />
                   </div>
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: '600', display: 'block', marginBottom: '6px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Group by</label>
+                    <label style={{ fontSize: '10px', fontWeight: '600', display: 'block', marginBottom: '4px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Group by</label>
                     <select
                       value={groupBy}
                       onChange={(e) => setGroupBy(e.target.value)}
-                      style={{ padding: '4px 10px', borderRadius: '4px', border: '1px solid var(--border-default)', fontSize: '12px', background: 'var(--input-bg)', color: 'var(--text-primary)', width: '100%' }}
+                      style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-default)', fontSize: '11px', background: 'var(--input-bg)', color: 'var(--text-primary)', width: '100%' }}
                     >
                       <option value="Region">Region</option>
                       <option value="Owner">Author</option>
@@ -2657,15 +2671,36 @@
                 </div>
               </div>
 
-              {/* Dashboard Guide */}
-              <div className="dashboard-guide" style={{ background: '#FFFFFF', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow)' }}>
-                <div style={{ fontWeight: '600', marginBottom: '8px', color: 'var(--text-tertiary)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Guide</div>
-                <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--text-tertiary)', fontSize: '10px', lineHeight: '1.8' }}>
-                  <li><strong style={{ color: 'var(--text-secondary)' }}>Headers:</strong> Click to expand/collapse</li>
-                  <li><strong style={{ color: 'var(--text-secondary)' }}>Timeline:</strong> Drag blocks to move dates</li>
-                  <li><strong style={{ color: 'var(--text-secondary)' }}>Edit Mode:</strong> Tick automation steps</li>
-                  <li><strong style={{ color: 'var(--text-secondary)' }}>Export/Import:</strong> Save & restore data</li>
-                </ul>
+              {/* Dashboard Guide - compact tooltip */}
+              <div className="dashboard-guide" style={{ position: 'relative', display: 'inline-block', alignSelf: 'flex-start' }}>
+                <div
+                  style={{
+                    width: '24px', height: '24px', borderRadius: '50%',
+                    background: 'var(--bg-surface-2)', border: '1px solid var(--border-default)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)',
+                    cursor: 'help', fontFamily: "'DM Sans', sans-serif"
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.nextSibling.style.display = 'block'; }}
+                  onMouseLeave={(e) => { e.currentTarget.nextSibling.style.display = 'none'; }}
+                >?</div>
+                <div style={{
+                  display: 'none', position: 'absolute', bottom: '32px', left: 0,
+                  background: '#FFFFFF', padding: '12px 14px', borderRadius: '6px',
+                  border: '1px solid var(--border-default)', boxShadow: 'var(--shadow-md)',
+                  width: '200px', zIndex: 50
+                }}
+                  onMouseEnter={(e) => { e.currentTarget.style.display = 'block'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.display = 'none'; }}
+                >
+                  <div style={{ fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Guide</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', lineHeight: '1.7' }}>
+                    <div><strong style={{ color: 'var(--text-secondary)' }}>Headers</strong> — click to expand</div>
+                    <div><strong style={{ color: 'var(--text-secondary)' }}>Timeline</strong> — drag to move dates</div>
+                    <div><strong style={{ color: 'var(--text-secondary)' }}>Edit Mode</strong> — tick automation steps</div>
+                    <div><strong style={{ color: 'var(--text-secondary)' }}>Export</strong> — save & restore data</div>
+                  </div>
+                </div>
               </div>
             </div>
 
