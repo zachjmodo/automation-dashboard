@@ -411,13 +411,13 @@
       { title: "Solar auctions (AO PPE2 Neutre)", region: "Europe", subregion: "France", owner: "Timoth\u00e9e", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
       { title: "Livestream takeaways (France)", region: "Europe", subregion: "France", owner: "Timoth\u00e9e", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
       // Spain sub-region
-      { title: "Investor Outlook (Spain)", region: "Europe", subregion: "Spain", owner: "Pablo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
-      { title: "Forecast Update (Spain)", region: "Europe", subregion: "Spain", owner: "Pablo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
-      { title: "Battery Buildout (Spain)", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
-      { title: "Gas run profiles", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
-      { title: "Country specific capture rates", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
-      { title: "Hydro run profiles", region: "Europe", subregion: "Spain", owner: "Paulo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
-      { title: "Livestream takeaways (Spain)", region: "Europe", subregion: "Spain", owner: "Pablo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Investor Outlook (Spain)", region: "Europe", subregion: "Iberia", owner: "Pablo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Forecast Update (Spain)", region: "Europe", subregion: "Iberia", owner: "Pablo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Battery Buildout (Spain)", region: "Europe", subregion: "Iberia", owner: "Paulo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Gas run profiles", region: "Europe", subregion: "Iberia", owner: "Paulo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Country specific capture rates", region: "Europe", subregion: "Iberia", owner: "Paulo", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
+      { title: "Hydro run profiles", region: "Europe", subregion: "Iberia", owner: "Paulo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
+      { title: "Livestream takeaways (Spain)", region: "Europe", subregion: "Iberia", owner: "Pablo", cadence: "Bi-annual", automation: 0, dates: ["2026-06-15", "2026-12-15"] },
       // Italy sub-region
       { title: "FER-X", region: "Europe", subregion: "Italy", owner: "Timoth\u00e9e", cadence: "Annual", automation: 0, dates: ["2026-12-15"] },
       { title: "Battery Buildout (Italy)", region: "Europe", subregion: "Italy", owner: "Timoth\u00e9e", cadence: "Quarterly", automation: 0, dates: ["2026-03-15", "2026-06-15", "2026-09-15", "2026-12-15"] },
@@ -825,7 +825,7 @@
       const groupedArticles = useMemo(() => {
         const groups = {};
         filteredArticles.forEach(article => {
-          const key = groupBy === "Owner" ? article.owner : article.region;
+          const key = groupBy === "Owner" ? article.owner : (article.subregion || article.region);
           if (!groups[key]) {
             groups[key] = [];
           }
@@ -1948,8 +1948,9 @@
             {/* Collapsible Group Sections */}
             {Object.entries(groupedArticles).sort(([a], [b]) => a.localeCompare(b)).map(([groupKey, groupArticles]) => {
               const isRegionGroup = groupBy === "Region";
+              const groupRegion = isRegionGroup ? (groupArticles[0]?.region || groupKey) : null;
               const groupColor = isRegionGroup
-                ? getRegionColor(groupKey)
+                ? getRegionColor(groupRegion)
                 : { bg: '#FFFFFF', border: 'var(--text-secondary)', text: 'var(--text-primary)' };
               const groupStats = {
                 total: groupArticles.length,
