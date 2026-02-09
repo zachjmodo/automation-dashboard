@@ -1805,23 +1805,6 @@
                   Import
                   <input type="file" accept=".json" onChange={importData} style={{ display: 'none' }} />
                 </label>
-                <button
-                  onClick={resetData}
-                  style={{
-                    padding: '7px 14px',
-                    background: 'var(--button-bg)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid rgba(232, 67, 101, 0.3)',
-                    borderRadius: '4px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--status-none-bg)'; e.currentTarget.style.borderColor = 'var(--status-none)'; e.currentTarget.style.color = 'var(--status-none)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--button-bg)'; e.currentTarget.style.borderColor = 'rgba(232, 67, 101, 0.3)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-                >
-                  Reset
-                </button>
               </div>
             </div>
 
